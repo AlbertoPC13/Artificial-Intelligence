@@ -9,13 +9,13 @@
 %	
 %	Predicados relevantes:
 %
-%		contiene_número(<lista>).
-%		inserta_ceros(<lista>,<respuesta>).
-%		rota(<lista>,<n>,<respuesta>).
-%		reversa_simple(<lista>,<respuesta>).
-%		inserta0_en(<término>,<lista>,<posición>,<resultado>).
-%		promedio_parcial(<lista>,<n>,<resultado>).
-%		fibonacci(<n>,<resultado>).
+%       contiene_número(<lista>).
+%       inserta_ceros(<lista>,<respuesta>).
+%       rota(<lista>,<n>,<respuesta>).
+%       reversa_simple(<lista>,<respuesta>).
+%       inserta0_en(<término>,<lista>,<posición>,<resultado>).
+%       promedio_parcial(<lista>,<n>,<resultado>).
+%       fibonacci(<n>,<resultado>).
 %       simplifica(<lista>,<resultado>).
 %       depura(<lista>,<resultado>).
 %       máximo(<lista>,<resultado>).
