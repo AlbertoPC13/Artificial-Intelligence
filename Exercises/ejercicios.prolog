@@ -1,10 +1,41 @@
 % =================================================================================== %
+%
+%   Alberto Palacios Cabrera
+%	
+%	Tarea #2. Paquete de ejercicios Prolog
+%
+%	- Construya predicados Prolog, etiquetados como se indica en cada problema el
+%   enunciado del mismo. Puede usar más de un predicado para cada problema.
+%	
+%	Predicados relevantes:
+%
+%		contiene_número(<lista>).
+%		inserta_ceros(<lista>,<respuesta>).
+%		rota(<lista>,<n>,<respuesta>).
+%		reversa_simple(<lista>,<respuesta>).
+%		inserta0_en(<término>,<lista>,<posición>,<resultado>).
+%		promedio_parcial(<lista>,<n>,<resultado>).
+%		fibonacci(<n>,<resultado>).
+%       simplifica(<lista>,<resultado>).
+%       depura(<lista>,<resultado>).
+%       máximo(<lista>,<resultado>).
+%       anti_consonante(<lista>,<resultado>).
+%       vocales(<lista>,<resultado>).
+%       cada_dos(<lista>,<resultado>).
+%       contexto(<lista>,<elemento>,<resultado>).
+%       particiona(<lista>,<pos1>,<lista1>,<lista2>).
+%
+% =================================================================================== %
+
+% =================================================================================== %
 % 1) [] contiene_número/1. Verificar si una lista contiene algún elemento númerico.
 %
 %                   contiene_número(<lista>).
 %
-% Verdadero si <lista> es una lista que contiene algún elemento númerico,
+% Verdadero si <lista> es una lista que contiene algún elemento númerico**,
 % falso en cualquier otro caso.
+%
+% **El valor númerico puede ser entero o cualquier elemento perteneciente a los reales
 
 contiene_número([X|_]) :-
     number(X),!.
@@ -31,7 +62,7 @@ inserta_ceros([X|Resto],[X,0|Respuesta]) :-
 % =================================================================================== %
 
 % =================================================================================== %
-% 3) [sin usar append] rota/3. Rotar los elementos de una lista alún número
+% 3) [sin usar append] rota/3. Rotar los elementos de una lista algún número
 % de posiciones hacia la derecha.
 
 %                   rota(<lista>,<n>,<respuesta>).
@@ -40,16 +71,28 @@ inserta_ceros([X|Resto],[X,0|Respuesta]) :-
 % pero rotados hacia la derecha <n> posiciones.
 
 rota(Lista,0,Lista) :- !.
+
 rota(Lista, N, Respuesta) :-
     N > 0,
     desplazar_1(Lista,ListaNueva),
     M is N - 1,
     rota(ListaNueva,M,Respuesta).
 
+% desplazar_1/2. Toma una lista y desplaza 1 posición a la derecha cada elemento 
+% que la conforma.
+
+%                   desplaza_1(<lista>,<respuesta>).
+
 desplazar_1(Lista, [Resto|Inicio]):- 
     concatenar(Inicio,[Resto], Lista).
 
+% concatenar/3. Concatena dos listas para generar una nueva lista conformada por
+% los elementos que conforman a las listas originales.
+
+%                   concatenar(<lista_1>,<lista_2>,<respuesta>).
+
 concatenar([],Lista,Lista) :- !.
+
 concatenar([Inicio|Resto],Lista2,[Inicio|Lista3]):- concatenar(Resto,Lista2,Lista3).
 
 % =================================================================================== %
@@ -62,6 +105,7 @@ concatenar([Inicio|Resto],Lista2,[Inicio|Lista3]):- concatenar(Resto,Lista2,List
 % Verdadero si <respuesta> es la inversión de primer nivel de <lista>.
 
 reversa_simple([],[]).
+
 reversa_simple([X|Resto],Respuesta) :-
     reversa_simple(Resto,Lista),
     concatenar(Lista,[X],Respuesta).
@@ -103,7 +147,13 @@ promedio_parcial(Lista,N,Resultado) :-
     suma_n(Números,N,Suma),
     Resultado is Suma rdiv N.
 
+% obtener_números/2. Toma una lista y genera una nueva lista que contiene únicamente
+% los elementos númericos de la lista original.
+
+%                   desplaza_1(<lista>,<resultado>).
+
 obtener_números([],[]).
+
 obtener_números([X|Resto],[X|Lista]) :-
     number(X),
     obtener_números(Resto,Lista), !.
@@ -112,8 +162,15 @@ obtener_números([X|Resto],Lista) :-
     \+ number(X),
     obtener_números(Resto,Lista).
 
+% suma/3. Realiza la suma de los primeros N elementos de la lista.
+%
+% NOTA: La lista que recibe como parámetro debe incluir únicamente elementos númericos.
+
+%                   suma(<lista>,<N>,<resultado>).
+
 suma([],_,0) :- !.
 suma_n(_,0,0) :- !.
+
 suma_n([X|Resto],N,Resultado) :-
     N > 0,
     number(X),
@@ -129,6 +186,9 @@ suma_n([X|Resto],N,Resultado) :-
 %                   fibonacci(<n>,<resultado>).
 
 % Verdadero si <resultado> es el número Fibonacci correspondiente a <n>.
+%
+% NOTA: El orden de la base de conocimiento permite que al encontrar el primer
+% resultado a la consulta el motor de inferencia no continúe buscando respuestas.
 
 fibonacci(N,Resultado) :-
     N > 1,
@@ -197,7 +257,15 @@ máximo(Lista,Resultado) :-
     obtener_números(Lista,Números),
     obtener_máximo(Números,Resultado).
 
+% obtener_máximo/2. Obtiene el valor númerico máximo de la lista recibida como
+% parámetro.
+
+% NOTA: La lista que recibe como parámetro debe incluir únicamente elementos númericos.
+
+%                   desplaza_1(<lista>,<resultado>).
+
 obtener_máximo([],0).
+
 obtener_máximo([X|Resto],Resultado) :-
     obtener_máximo(Resto,Valor),
     X >= Valor,
@@ -207,6 +275,7 @@ obtener_máximo([X|Resto],Resultado) :-
     obtener_máximo(Resto,Valor),
     X < Valor,
     Resultado is Valor, !.
+
 % =================================================================================== %
 
 % =================================================================================== %
@@ -227,6 +296,7 @@ anti_consonante([X|Resto],[X|Resultado]) :-
 anti_consonante([X|Resto],Resultado) :-
     \+ member(X,[a,e,i,o,u]),
     anti_consonante(Resto,Resultado), !.
+
 % =================================================================================== %
 
 % =================================================================================== %
@@ -249,6 +319,7 @@ vocales([X|Resto],[Mayúscula|Resultado]) :-
 vocales([X|Resto],Resultado) :-
     \+ member(X,[a,e,i,o,u]),
     vocales(Resto,Resultado), !.
+
 % =================================================================================== %
 
 % =================================================================================== %
@@ -265,6 +336,14 @@ cada_dos([],[]).
 cada_dos(Lista,Resultado) :-
     length(Lista, Tamaño),
     intercalar_lista(Lista,0,Tamaño,Resultado), !.
+
+% intercalar_lista/4. Genera una lista nueva con los elementos intercalados de dos
+% en dos dentro de la lista original.
+
+% NOTA: Se aprovecha la operación módulo para encontrar los índices deseados
+% de la lista.
+
+%                   intercalar_lista(<lista>,<índice>,<tamaño>,<resultado>).
 
 intercalar_lista([],_,_,[]).
 
@@ -286,6 +365,7 @@ intercalar_lista([_|Resto],Índice,Tamaño,Resultado) :-
     Índice mod 2 =\= 0,
     N is Índice + 1,
     intercalar_lista(Resto,N,Tamaño,Resultado).
+
 % =================================================================================== %
 
 % =================================================================================== %
@@ -297,7 +377,6 @@ intercalar_lista([_|Resto],Índice,Tamaño,Resultado) :-
 % Verdadero si <resultado> es una lista conteniendo exculisvamente el elemento
 % anterior y el posterior, en la lista original, de cada instancia de <elemento>.
 
-
 contexto([],_,[]).
 
 contexto(Lista,Elemento,Respuesta) :-
@@ -306,6 +385,12 @@ contexto(Lista,Elemento,Respuesta) :-
     Índice_2 is Índice_elemento + 1,
     length(Lista,Tamaño),
     encontrar_contexto(Lista,Índice_1,Índice_2,Tamaño,Respuesta), !.
+
+% encontrar_contexto/5. Encuentra el contexto de un elemento a partir de los índices
+% de los elementos adyacentes al mismo, validando las limitaciones del tamaño de 
+% la lista.
+
+%       encontrar_contexto(<lista>,<índice_1>,<índice_2>,<tamaño>,<resultado>).
 
 encontrar_contexto(Lista,Índice_1,Índice_2,Tamaño,[Elemento_1,Elemento_2]) :-
     Índice_1 >= 1,
@@ -326,6 +411,7 @@ encontrar_contexto(Lista,Índice_1,Índice_2,Tamaño,[Elemento_1,[]]) :-
 encontrar_contexto(_,Índice_1,Índice_2,Tamaño,[[],[]]) :-
     Índice_1 < 1,
     Índice_2 > Tamaño.
+
 % =================================================================================== %
 
 % =================================================================================== %
@@ -344,4 +430,5 @@ particiona(Lista,Posición_1,Lista_1,Lista_2) :-
     Índice is Posición_1 - 1,
     length(Lista_1,Índice),
     append(Lista_1,Lista_2,Lista).
+
 % =================================================================================== %
