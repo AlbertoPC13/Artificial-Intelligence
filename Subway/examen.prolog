@@ -281,42 +281,150 @@ sigue(nopalera, zapotitlán, línea_12).
 sigue(zapotitlán, tlaltenco, línea_12).
 sigue(tlaltenco, tláhuac, línea_12).
 
-% ==========================================================================
-imprimirLista([]) :- nl.
-imprimirLista([H|T]) :- 
-	write(H),
+% =================================================================================== %
+%
+%   Alberto Palacios Cabrera
+%	
+%	Examen parcial. Sistema Metro CDMX
+%
+%   - Programe en Prolog un "sistema de ayuda para usuarios del Sistema de Transporte
+%   Colectivo Metro CDMX".
+%
+%   - Los predicados básicos a programar son: mejor_ruta/4, peor_ruta/4 
+%   y reporte_viaje/2
+%
+%   - El costo en tiempo de cada arista se debe calcular:
+%   
+%           tiempo_tramo * el grado de la estación destino, más tiempo_transbordo 
+%           en cada transbordo de líneas
+%           
+%           El tiempo total de un viaje se calcula como la suma de tiempos en cada
+%           trayecto, más el tiempo_inicial y el tiempo_final   
+%       
+%	Predicados básicos:
+%
+%   color(<línea>,<color>).
+%   trayecto(<línea>,<estación-1>,<estación-2>).
+%   sigue(<estación-1>,<estación-2>,<línea>).
+%
+%	Predicados relevantes:
+%
+%   mejor_ruta(<estación1>,<estación2>,<mejor_ruta>,<tiempo>).
+%   peor_ruta(<estación1>,<estación2>,<mejor_ruta>,<tiempo>).
+%   reporte_viaje(<estación1>,<estación2>).
+%   encontrar_ruta(<estación-A>,<estación-B>,<ruta>).
+%   navegar(<estación-A>-<línea-1>,<estación-B>-<línea-2>,<memoria>,<ruta>).
+%   buscar_conexión(<estación-A>-<línea-1>,<estación-B>-<línea-2>,<conexiones>,<ruta>).
+%   encontrar_ruta_larga(<estación-A>,<estación-B>,<ruta>).
+%   navegar_grafo_completo(<estación-A>-<línea-1>,<estación-B>-<línea-2>,<memoria>,<ruta>).
+%   
+% =================================================================================== %
+
+% =================================================================================== %
+%   imprimir_lista/1. Imprime cada elemento contenido en la 
+%	lista proporcionada.
+%
+%                   imprimir_lista(<Lista>).
+%
+%	NOTA: Este predicado solo es utilizado con propósitos de pruebas.
+
+imprimir_lista([]) :- nl.
+imprimir_lista([X|Resto]) :- 
+	write(X),
 	write(' '),
 	nl,
-	imprimirLista(T).
+	imprimir_lista(Resto).
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   eliminar_duplicados/2. Eliminar de una lista todos los elementos que se encuentren 
+%   duplicados.
+
+%                   eliminar_diplicados(<lista>,<resultado>).
+
+%   Verdadero si <resultado> es una lista con los mismos elementos que <lista> pero con
+%   sólo una instancia de cada elemento.
 
 eliminar_duplicados([], []).
+
 eliminar_duplicados([X|Resto],Lista) :-
     member(X,Resto), !,
     eliminar_duplicados(Resto,Lista).
+
 eliminar_duplicados([X|Resto],[X|Lista]) :-
     eliminar_duplicados(Resto,Lista).
 
-% Encuentra transbordos de una línea
-transbordos(Ruta,Conexión):-
-    sigue(X,_Y,Ruta), sigue(X,_Z,Conexión), dif(Ruta,Conexión).
-transbordos(Ruta,Conexión):-
-    sigue(_X,Y,Ruta), sigue(Y,_Z,Conexión), dif(Ruta,Conexión).
-transbordos(Ruta,Conexión):-
-    sigue(_X,Y,Ruta), sigue(_Z,Y,Conexión), dif(Ruta,Conexión).
+% =================================================================================== %
 
-% Encuentra conexiones de una línea, totales
-conexiones(Ruta,Conexiones) :-
-    findall(Líneas,transbordos(Ruta,Líneas),Lista), sort(Lista,Conexiones).
+% =================================================================================== %
+%   transbordos/2. Determina los transbordos que tiene la línea proporcionada en los
+%   parámetros. 
 
-% Encuentra las líneas a las cuales pertenece un aestación
-línea_de_estación(A,Línea) :-
-    trayecto(Línea,A,_) ; trayecto(Línea,_,A).
-línea_de_estación(A,Línea) :-
-    sigue(A,_,Línea) , sigue(_,A,Línea).
+%                   transbordos(<línea>,<conexión>).
 
-% ===================================================================
-% Código para encontrar mejor ruta
-% ===================================================================
+%   Verdadero si <conexión> es una línea que conecta con <línea>.
+
+transbordos(Línea,Conexión):-
+    sigue(X,_Y,Línea), sigue(X,_Z,Conexión), dif(Línea,Conexión).
+transbordos(Línea,Conexión):-
+    sigue(_X,Y,Línea), sigue(Y,_Z,Conexión), dif(Línea,Conexión).
+transbordos(Línea,Conexión):-
+    sigue(_X,Y,Línea), sigue(_Z,Y,Conexión), dif(Línea,Conexión).
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   conexiones/2. Determina las conexiones que tiene la línea proporcionada en los
+%   parámetros. 
+
+%                   conexiones(<línea>,<conexiones>).
+
+%   Verdadero si <conexiones> es una lista con las líneas que conectan con <línea>.
+
+conexiones(Línea,Conexiones) :-
+    findall(Líneas,transbordos(Línea,Líneas),Lista), sort(Lista,Conexiones).
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   línea_de_estación/2. Determina la línea a la cual pertenece la estación 
+%   proporcionada como parámetro.
+
+%                   línea_de_estación(<estación>,<línea>).
+
+%   Verdadero si <línea> es la línea a la cual pertenece <estación>.
+
+línea_de_estación(Estación,Línea) :-
+    trayecto(Línea,Estación,_) ; trayecto(Línea,_,Estación).
+
+línea_de_estación(Estación,Línea) :-
+    sigue(Estación,_,Línea) , sigue(_,Estación,Línea).
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   encontrar_ruta/3. Predicado inicial en la busqueda de la mejor ruta. Identifica
+%   las líneas correspondientes de las estaciones recibidas como parámetros y
+%   navega dentro del grafo para encontrar la ruta requerida para llegar
+%   del vértice "A" al vértice "B".
+
+%                   encontrar_ruta(<estación-A>,<estación-B>,<ruta>).
+
+%   Verdadero si <ruta> es una lista con pares en el siguiente formato:
+%
+%                   <estación> - <línea>
+
+% =================================================================================== %
+%   El primer caso de encontrar_ruta/3 es utilizado cuando la estación destino
+%   pertenece a la línea A del Metro. Los predicados navegar/4 fueron diseñados de 
+%   manera que la ruta sea delímitada de manera que el árbol de resolución genere
+%   una menor cantidad de ramas que los predicados usados en la peor ruta. 
+%   Por lo cual, la línea A del Metro no puede ser accedida de manera directa con
+%   los predicados navegar/4. Para dar solución a esto, se plantea que el viaje se
+%   realiza de la estación inicio a Pantitlán y posteriormente a la verdadera 
+%   estación de destino.
+% =================================================================================== %
 
 encontrar_ruta(A,B,Ruta) :-
     línea_de_estación(A,Línea_inicio),
@@ -328,6 +436,13 @@ encontrar_ruta(A,B,Ruta) :-
     navegar(pantitlán-Línea_aux,B-Línea_fin,Mem,Ruta_2),
     append(Ruta_1,Ruta_2,Lista),
     eliminar_duplicados(Lista,Ruta).
+
+% =================================================================================== %
+%   El segundo caso de encontrar_ruta/3 es utilizado cuando la estación 
+%   inicio pertenece a la línea A del Metro. Se plantea que el viaje se realiza de
+%   la estación inicio a Pantitlán y posteriormente a la verdadera estación 
+%   de destino.
+% =================================================================================== %
 
 encontrar_ruta(A,B,Ruta) :-
     línea_de_estación(A,Línea_inicio),
@@ -341,20 +456,64 @@ encontrar_ruta(A,B,Ruta) :-
     append(Ruta_1,Ruta_2,Lista),
     eliminar_duplicados(Lista,Ruta).
 
+% =================================================================================== %
+%   El tercer caso unifica cuando la estación de inicio y destino
+%   pertenecen a la misma línea.
+% =================================================================================== %
+
 encontrar_ruta(A,B,Ruta) :-
     línea_de_estación(A,Línea),
     línea_de_estación(B,Línea),
     navegar(A-Línea,B-Línea,[],Ruta).
+
+% =================================================================================== %
+%   El cuarto caso unifica cuando la estación de inicio y destino
+%   pertenecen a diferentes líneas.
+% =================================================================================== %
 
 encontrar_ruta(A,B,Ruta) :-
     línea_de_estación(A,Línea_inicio),
     línea_de_estación(B,Línea_fin),
     navegar(A-Línea_inicio,B-Línea_fin,[],Ruta).
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   navegar/4. Predicado que realiza el recorrido del grafo desde el vértice "A" al
+%   vértice "B". El resultado es una ruta Hamiltoniana que se usará en el predicado
+%   mejor_ruta/4. 
+
+%       navegar(<estación-A>-<línea-1>,<estación-B>-<línea-2>,<memoria>,<ruta>).
+
+%   Verdadero si <ruta> es una lista con pares en el siguiente formato:
+
+%                   <estación> - <línea>
+
+%   Además, <ruta> debe corresponder a la secuencia de estaciónes que cumpla con 
+%   ser la ruta Hamiltoniana del vértice "A" a "B". 
+
+% =================================================================================== %
+%   El primer caso de navegar/4 es utilizado cuando la estación inicio y 
+%   destino sean la misma estación. 
+% =================================================================================== %
+
 navegar(A-Línea,A-Línea,_,[A-Línea]) :- !.
+
+% =================================================================================== %
+%   El segundo caso unifica cuando la estación inicio y destino sean 
+%   distintas pero pertenecen a la misma línea. Además, se puede llegar de manera 
+%   directa de la estación "A" a la "B" y viceversa.  
+% =================================================================================== %
 
 navegar(A-Línea,B-Línea,_,[A-Línea,B-Línea]) :- 
     A \== B, (sigue(A,B,Línea) ; sigue(B,A,Línea)).
+
+% =================================================================================== %
+%   El tercer caso unifica en caso de que la estación inicio y destino sean 
+%   distintas y no pertenezcan a la misma línea. Sin embargo, existe una estación
+%   intermedia "Z" que permite llegar de la estación "A" a una estación que
+%   pertenezca a la línea de "B".
+% =================================================================================== %
 
 navegar(A-Línea_inicio,B-Línea_fin,Mem,[A-Línea_inicio|Ruta]) :- 
     A \== B, 
@@ -362,6 +521,13 @@ navegar(A-Línea_inicio,B-Línea_fin,Mem,[A-Línea_inicio|Ruta]) :-
     (sigue(A,Z,Línea_fin) ; sigue(Z,A,Línea_fin)),
     \+ member(Z,Lista),
     navegar(Z-Línea_fin,B-Línea_fin,[A,Z|Lista],Ruta).
+
+% =================================================================================== %
+%   El cuarto caso unifica en caso de que la estación inicio y destino sean 
+%   distintas y no pertenezcan a la misma línea. Sin embargo, existe una estación
+%   intermedia "Z" que permite llegar de la estación "A" a una estación que
+%   pertenezca a su misma línea.
+% =================================================================================== %
 
 navegar(A-Línea_inicio,B-Línea_fin,Mem,[A-Línea_inicio|Ruta]) :- 
     A \== B,
@@ -371,6 +537,16 @@ navegar(A-Línea_inicio,B-Línea_fin,Mem,[A-Línea_inicio|Ruta]) :-
     \+ member(Z,Lista),
     navegar(Z-Línea_inicio,B-Línea_fin,[A,Z|Lista],Ruta).
 
+% =================================================================================== %
+%   El quinto caso unifica en caso de que la estación inicio y destino sean 
+%   distintas y no pertenezcan a la misma línea. En este caso se encuentran las 
+%   conexiones que tiene la línea "A" y la línea "B" para posteriormente 
+%   intersectar dichos conjuntos. Esta acción permite que el proceso de encontrar
+%   la mejor ruta sea delimitado, ya que de esta forma no se ven incolucradas las
+%   líneas que no tienen una conexión directa entre la línea de inicio y 
+%   la de destino. 
+% =================================================================================== %
+
 navegar(A-Línea_inicio,B-Línea_fin,Mem,Ruta) :- 
     A \== B,
     Línea_inicio \== Línea_fin,
@@ -378,6 +554,29 @@ navegar(A-Línea_inicio,B-Línea_fin,Mem,Ruta) :-
     conexiones(Línea_fin,Conexiones_fin),
     intersection(Conexiones_inicio,Conexiones_fin,Conexiones_comunes),
     buscar_conexión(A-Línea_inicio,B-Línea_fin,Mem,Conexiones_comunes,Ruta).
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   buscar_conexión/5. Predicado que unifica si existe una estación "Z" la cual
+%   conecta con la estación "A" y ambas estaciones pertenecen a una línea miembro
+%   de la lista proporcionada de líneas que intersectan en la línea de inicio y 
+%   línea destino.
+
+%   buscar_conexión(<estación-A>-<línea-1>,<estación-B>-<línea-2>,<conexiones>,<ruta>).
+
+%   Verdadero si <ruta> es una lista con pares en el siguiente formato:
+
+%                   <estación> - <línea>
+
+%   Además, <ruta> debe corresponder a la secuencia de estaciónes que cumpla con 
+%   ser la ruta Hamiltoniana del vértice "A" a "B".
+
+% =================================================================================== %
+%   El primer caso de buscar_conexión/5 unifica cuando se logra encontrar la
+%   estación "Z" previamente mencionada. En este predicado se vuelve a llamar a
+%   navegar/4 para continuar con el recorrido original.
+% =================================================================================== %
 
 buscar_conexión(A-Línea_inicio,B-Línea_fin,Mem,[Línea|_],[A-Línea_inicio|Ruta]) :-
     A \== B,
@@ -388,56 +587,196 @@ buscar_conexión(A-Línea_inicio,B-Línea_fin,Mem,[Línea|_],[A-Línea_inicio|Ru
     \+ member(Z,Lista),
     navegar(Z-Línea,B-Línea_fin,[A|Lista],Ruta).
 
+% =================================================================================== %
+%   El segundo caso vuelve a llamar a buscar_conexión/5 pero con el resto de la
+%   lista para intentar unificar con las demás líneas.
+% =================================================================================== %
+
 buscar_conexión(A-Línea_inicio,B-Línea_fin,Mem,[_|Resto],Ruta) :-
     buscar_conexión(A-Línea_inicio,B-Línea_fin,Mem,Resto,Ruta).
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   rutaH/3. Encuentra una ruta Hamiltoniana entre la estación "A" y "B".
+
+%                   rutaH(<estación-A>,<estación-B>,<ruta>).
+
+%   Verdadero si <ruta> corresponde a la secuencia de estaciónes que 
+%   cumpla con ser la ruta Hamiltoniana del vértice "A" a "B".
+
 rutaH(A,B,Ruta) :- encontrar_ruta(A,B,Ruta). 
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   calcular_rutas/3. Crea una lista con todas las rutas Hamiltonianas encontradas
+%   entre la estación "A" y "B". Además, elimina los elementos duplicados dentro
+%   de la lista generada.
+
+%               calcular_rutas(<estación-A>,<estación-B>,<rutas>).
+
+%   Verdadero si <rutas> es una lista que cumpla con ser las rutas Hamiltonianas
+%   del vértice "A" a "B". Las rutas encontradas corresponden a las posibles mejores
+%   rutas.
 
 calcula_rutas(A,B,Rutas) :- findall(R,rutaH(A,B,R),Lista), eliminar_duplicados(Lista, Rutas).
 
-% ===================================================================
-% Código para encontrar peor ruta
-% ===================================================================
+% =================================================================================== %
+
+% =================================================================================== %
+%   encontrar_ruta_larga/3. Predicado inicial en la busqueda de la peor ruta. 
+%   Identifica las líneas correspondientes de las estaciones recibidas como
+%   parámetros y navega dentro del grafo para encontrar la ruta requerida para llegar
+%   del vértice "A" al vértice "B".
+
+%               encontrar_ruta_larga(<estación-A>,<estación-B>,<ruta>).
+
+%   Verdadero si <ruta> es una lista con pares en el siguiente formato:
+%
+%                   <estación> - <línea>
 
 encontrar_ruta_larga(A,B,Ruta) :-
     línea_de_estación(A,Línea_inicio),
     línea_de_estación(B,Línea_fin),
-    navegar_l(A-Línea_inicio,B-Línea_fin,[],Ruta).
+    navegar_grafo_completo(A-Línea_inicio,B-Línea_fin,[],Ruta).
 
-navegar_l(A-Línea,A-Línea,_,[A-Línea]) :- !.
+% =================================================================================== %
 
-navegar_l(A-Línea,B-Línea,_,[A-Línea,B-Línea]) :- 
+% =================================================================================== %
+%   navegar_grafo_completo/4. Predicado que realiza el recorrido del grafo desde
+%   el vértice "A" al vértice "B". El resultado es una ruta Hamiltoniana que se 
+%   usará en el predicado peor_ruta/4. 
+
+%   navegar_grafo_completo(<estación-A>-<línea-1>,<estación-B>-<línea-2>,<memoria>,<ruta>).
+
+%   Verdadero si <ruta> es una lista con pares en el siguiente formato:
+
+%                   <estación> - <línea>
+
+%   Además, <ruta> debe corresponder a la secuencia de estaciónes que cumpla con 
+%   ser la ruta Hamiltoniana del vértice "A" a "B". 
+
+% =================================================================================== %
+%   El primer caso de navegar_grafo_completo/4 es utilizado cuando la estación 
+%   inicio y destino sean la misma estación. 
+% =================================================================================== %
+
+navegar_grafo_completo(A-Línea,A-Línea,_,[A-Línea]) :- !.
+
+% =================================================================================== %
+%   El segundo caso unifica cuando la estación inicio y destino sean 
+%   distintas pero pertenecen a la misma línea. Además, se puede llegar de manera 
+%   directa de la estación "A" a la "B" y viceversa.  
+% =================================================================================== %
+
+navegar_grafo_completo(A-Línea,B-Línea,_,[A-Línea,B-Línea]) :- 
     A \== B, (sigue(A,B,Línea) ; sigue(B,A,Línea)).
 
-navegar_l(A-Línea_inicio,B-Línea_fin,Mem,[A-Línea_inicio|Ruta]) :- 
+% =================================================================================== %
+%   El tercer caso unifica en caso de que la estación inicio y destino sean 
+%   distintas y no pertenezcan a la misma línea. Sin embargo, existe una estación
+%   intermedia "Z" a la cual puede llegar "A" de manera directa y viceversa.
+% =================================================================================== %
+
+navegar_grafo_completo(A-Línea_inicio,B-Línea_fin,Mem,[A-Línea_inicio|Ruta]) :- 
     A \== B, 
     dif(A, Z),
     dif(B, Z),
     (sigue(A,Z,Línea) ; sigue(Z,A,Línea)),
     \+ member(Z,Mem),
-    navegar_l(Z-Línea,B-Línea_fin,[A|Mem],Ruta).
+    navegar_grafo_completo(Z-Línea,B-Línea_fin,[A|Mem],Ruta).
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   rutaH_larga/3. Encuentra una ruta Hamiltoniana entre la estación "A" y "B".
+
+%                   rutaH_larga(<estación-A>,<estación-B>,<ruta>).
+
+%   Verdadero si <ruta> corresponde a la secuencia de estaciónes que 
+%   cumpla con ser la ruta Hamiltoniana del vértice "A" a "B".
+
+%   NOTA: El predicado se limita a obtener únicamente 1000 respuestas del predicado
+%   encontrar_ruta_larga/3
 
 rutaH_larga(A,B,Ruta) :- limit(1000,encontrar_ruta_larga(A,B,Ruta)). 
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   calcular_rutas_largas/3. Crea una lista con todas las rutas Hamiltonianas 
+%   encontradas entre la estación "A" y "B". Además, elimina los elementos duplicados
+%   dentro de la lista generada.
+
+%               calcular_rutas_largas(<estación-A>,<estación-B>,<rutas>).
+
+%   Verdadero si <rutas> es una lista que cumpla con ser las rutas Hamiltonianas
+%   del vértice "A" a "B". Las rutas encontradas corresponden a las posibles peores
+%   rutas.
+
 calcula_rutas_largas(A,B,Rutas) :- findall(R,rutaH_larga(A,B,R),Lista), eliminar_duplicados(Lista, Rutas).
 
-% ===================================================================
-% Cálculo de costo de viaje y mejor/peor ruta
-% ===================================================================
+% =================================================================================== %
+
+% =================================================================================== %
+%   incidencias/1. Indica las estaciones que inciden a la estación recibida como
+%   parámetro.
+
+%                               incidencias(<estación>).
+
+%   Verdadero si <estación> tiene una conexión con alguna otra estación en la base de 
+%   conocimiento.
 
 incidencias(A) :- 
     sigue(A,_X,_) ; sigue(_Y,A,_).
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   grado/2. Indica el grado de la estación recibida como parámetro.
+
+%                               grado(<estación>,<grado>).
+
+%   Verdadero si <grado> corresponde a el grado de la estación proporcionada
 
 grado(A,Grado) :-
     findall(_, incidencias(A),Lista),
     length(Lista, Grado).
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   transbordo/3. Indica si ocurre un transbordo a través del valor de las líneas
+%   proporcionadas.
+
+%                   transbordo(<línea-1>,<línea-2>,<tiempo>).
+
+%   El valor de <tiempo> se define de la siguiente manera:
+
+%   - Si el valor de las líneas es el mismo, tiempo es igual a 0
+%   - Si el valor de las líneas es diferente, tiempo es igual al valor definido
+%   de un transbordo
+
 transbordo(Línea_1,Línea_2,Tiempo) :-
     ((Línea_1 == Línea_2) -> Tiempo is 0 ; valor_parámetro(tiempo_transbordo,Tiempo)).
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   suma_ruta/2. Determina el tiempo parcial de la ruta proporcionada como parámetro.
+
+%                   suma_ruta(<ruta>,<tiempo>).
+
+%   Verdadero si <tiempo> corresponde a el tiempo parcial de la ruta proporcionada
+
+%   NOTA: Solo se toma en cuenta el tiempo de los tramos y el tiempo final.
+
 suma_ruta([],0).
+
 suma_ruta([_],Final) :-
     valor_parámetro(tiempo_final,Final).
+
 suma_ruta([_-Línea_1,Y-Línea_2|Resto],Suma) :-
     valor_parámetro(tiempo_tramo,Tramo),
     grado(Y,Grado),
@@ -446,10 +785,29 @@ suma_ruta([_-Línea_1,Y-Línea_2|Resto],Suma) :-
     suma_ruta(Lista,Suma_parcial),
     Suma is (Tramo * Grado) + Transbordo + Suma_parcial.
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   viaje/2. Determina el tiempo total de la ruta proporcionada como parámetro.
+
+%                   viaje(<ruta>,<tiempo>).
+
+%   Verdadero si <tiempo> corresponde a el tiempo total de la ruta proporcionada
+
+%   NOTA: Se toma en cuenta el tiempo de inicio y el tiempo parcial.
+
 viaje(Ruta,Tiempo) :-
     suma_ruta(Ruta,Suma),
     valor_parámetro(tiempo_inicial,Inicial),
     Tiempo is Inicial + Suma.
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   ruta_corta/3. Encuentra la ruta más corta respecto al tiempo en una lista de 
+%   rutas proporcionadas como parámetro.
+
+%                   ruta_corta(<rutas>,<ruta>,<tiempo>).
 
 ruta_corta(Rutas,R,Min) :-
     maplist(viaje,Rutas,Pesos),
@@ -457,28 +815,84 @@ ruta_corta(Rutas,R,Min) :-
     member(R,Rutas),
     viaje(R,Min).
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   ruta_larga/3. Encuentra la ruta más larga respecto al tiempo en una lista de 
+%   rutas proporcionadas como parámetro.
+
+%                   ruta_larga(<rutas>,<ruta>,<tiempo>).
+
 ruta_larga(Rutas,R,Max) :-
     maplist(viaje,Rutas,Pesos),
     max_list(Pesos,Max),
     member(R,Rutas),
     viaje(R,Max).
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   mejor_ruta/4. Encuentra la ruta más corta respecto al tiempo para el recorrido
+%   de la estación "A" a la estación "B".
+
+%                   mejor_ruta(<estación-A>,<estación-B>,<ruta>,<tiempo>).
+
+%   NOTA: El tiempo debe ser considerado como minutos de viaje
+
 mejor_ruta(A,B,Mejor,Tiempo) :- 
     calcula_rutas(A,B,Rutas),
     ruta_corta(Rutas,Mejor,Tiempo).
 
-mejores_rutas(A,B,Mejores) :- findall(R-T,mejor_ruta(A,B,R,T),Mejores).
+% =================================================================================== %
+
+% =================================================================================== %
+%   mejores_rutas/4. Encuentra las rutas más cortas respecto al tiempo para el recorrido
+%   de la estación "A" a la estación "B".
+
+%                   mejores_rutas(<estación-A>,<estación-B>,<ruta>,<tiempo>).
+%
+%   NOTA: Este predicado es útil en caso de que existan más de una ruta que generen 
+%   el mismo tiempo de recorrido.
+
+mejores_rutas(A,B,Mejores,Tiempo) :- findall(R-Tiempo,mejor_ruta(A,B,R,Tiempo),Mejores).
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   peor_ruta/4. Encuentra la ruta más larga respecto al tiempo para el recorrido
+%   de la estación "A" a la estación "B".
+
+%                   peor_ruta(<estación-A>,<estación-B>,<ruta>,<tiempo>).
+
+%   NOTA: El tiempo debe ser considerado como minutos de viaje
 
 peor_ruta(A,B,Peor,Tiempo) :- 
     calcula_rutas_largas(A,B,Rutas),
     ruta_larga(Rutas,Peor,Tiempo).
 
-peores_rutas(A,B,Peores) :- findall(R-T,peor_ruta(A,B,R,T),Peores).
-% ===================================================================
-% Código para despliegue de viaje
-% ===================================================================
+% =================================================================================== %
+
+% =================================================================================== %
+%   peores_rutas/4. Encuentra las rutas más cortas respecto al tiempo para el recorrido
+%   de la estación "A" a la estación "B".
+
+%                   peores_rutas(<estación-A>,<estación-B>,<ruta>,<tiempo>).
+%
+%   NOTA: Este predicado es útil en caso de que existan más de una ruta que generen 
+%   el mismo tiempo de recorrido.
+
+peores_rutas(A,B,Peores,Tiempo) :- findall(R-Tiempo,peor_ruta(A,B,R,Tiempo),Peores).
+
+% =================================================================================== %
+
+% =================================================================================== %
+%   despliegue_viaje/3. Despliega en consola la información de los tramos dentro de
+%   la ruta proporcionada como parámetro.
+
+%           despliegue_viaje(<ruta>,<línea_actual>,<tiempo>).
 
 despliuegue_viaje([],_,_).
+
 despliuegue_viaje([X-_],_,_) :-
     valor_parámetro(tiempo_final,Final),
     format('Final: ~w, ~w minutos ~n', [X,Final]).
@@ -504,16 +918,32 @@ despliuegue_viaje([X-_,Y-Línea_2],_,Tramo) :-
     N is Tramo + 1,
     despliuegue_viaje([Y-Línea_2],Línea_2,N).
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   minutos_a_horas/3. Convierte el tiempo total del viaje a un formato de horas
+%   y minutos para ser usado en el predicado reporte_viaje/3.
+
+%           minutos_a_horas(<tiempo>,<horas>,<minutos>).
+
 minutos_a_horas(Tiempo,Horas,Minutos) :-
     Horas is Tiempo // 60,
     Minutos is Tiempo mod 60.
 
+% =================================================================================== %
+
+% =================================================================================== %
+%   reporte_viaje/2. Muestra por consola un reporte detallado de la mejor ruta
+%   para el trayecto de la estación "A" a la estación "B".
+
+%           reporte_viaje(<estación-A>,<estación-B>).
+
 reporte_viaje(A,B) :-
-    mejores_rutas(A,B,Rutas),
-    Rutas = [Ruta-Tiempo|_],
+    mejor_ruta(A,B,Ruta,Tiempo),
     minutos_a_horas(Tiempo,Horas,Minutos),
     format('Tiempo total de viaje: ~w minutos = ~w horas y ~w minutos ~n', [Tiempo,Horas,Minutos]),
     valor_parámetro(tiempo_inicial,Inicio),
     format('Inicio: ~w, ~w minutos~n', [A,Inicio]),
     Ruta = [_-Línea_inicio|_],
     despliuegue_viaje(Ruta,Línea_inicio,1).
+% =================================================================================== %

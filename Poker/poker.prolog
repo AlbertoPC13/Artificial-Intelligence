@@ -391,21 +391,21 @@ analizarManos([Mano|RestoManos],Lugar) :-
 	analizarManos(RestoManos,Resto).
 
 %===================================================================
-%	imprimirLista/1
-%	imprimirLista(+<Lista>).
+%   imprimir_lista/1. Imprime cada elemento contenido en la 
+%	lista proporcionada.
+%
+%                   imprimir_lista(<Lista>).
 %
 %	NOTA: Este predicado solo es utilizado con propósitos de
 %	pruebas
 %
-%	Conjunto de predicados que permiten imprimir en consola los
-%	elementos de una lista
 %===================================================================
-imprimirLista([]) :- nl.
-imprimirLista([H|T]) :- 
-	write(H),
+imprimir_lista([]) :- nl.
+imprimir_lista([X|Resto]) :- 
+	write(X),
 	write(' '),
 	nl,
-	imprimirLista(T).
+	imprimir_lista(Resto).
 
 %===================================================================
 %	imprimirCabecera/0
