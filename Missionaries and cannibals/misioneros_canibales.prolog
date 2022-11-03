@@ -126,10 +126,10 @@ busca_BFS(Ei,Em,Plan) :-
 %   bfs/3. Predicado que realiza la busqueda ordenada por anchura para la
 %   solución del problema planteado. 
 
-%                  bfs(<estado inicial>,<agenda>,<ruta>).
+%                  bfs(<estado meta>,<agenda>,<ruta>).
 
 %   Verdadero si <ruta> es una lista con los estados requeridos para llegar del
-%   <estado inicial> al estado meta con el cual inicia la agenda.
+%   estado inicial, con el cual inicia la agenda, al <estado meta>.
 %   
 %   NOTA: Al se una busqueda ordenada BFS la agenda con la cual se realiza el
 %   recorrido hace uso de una estructura de tipo Cola (FIFO).
@@ -164,10 +164,10 @@ busca_DFS(Ei,Em,Plan) :-
 %   dfs/3. Predicado que realiza la busqueda ordenada en profundidad para la
 %   solución del problema planteado. 
 
-%                  dfs(<estado inicial>,<agenda>,<ruta>).
+%                  dfs(<estado meta>,<agenda>,<ruta>).
 
 %   Verdadero si <ruta> es una lista con los estados requeridos para llegar del
-%   <estado inicial> al estado meta con el cual inicia la agenda.
+%   estado inicial, con el cual inicia la agenda, al <estado meta>.
 %   
 %   NOTA: Al se una busqueda ordenada BFS la agenda con la cual se realiza el
 %   recorrido hace uso de una estructura de tipo Pila (LIFO).
