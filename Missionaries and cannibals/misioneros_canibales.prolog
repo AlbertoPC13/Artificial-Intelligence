@@ -299,7 +299,7 @@ recorrer_pasos([Origen,Destino|Resto],N) :-
 % =================================================================================== %
 %   despliega/1. Predicado que permite visualizar en consola la solución al problema
 %   de los misioneros y caníbales de manera detallada. Se hace uso de la busqueda en 
-%   profundidad para que sea realizada de manera óptima.
+%   anchura para que sea realizada de manera óptima.
 
 %               despliega(<plan>).
 
