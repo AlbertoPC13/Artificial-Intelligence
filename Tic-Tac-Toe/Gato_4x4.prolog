@@ -282,9 +282,9 @@ evaluación_heurística((Tablero,Jugador),Evaluación) :-
     posiciones_de_victoria(Símbolo,Tablero),
     Evaluación is -10, !.
 
-%   En este caso al encontrar un estado en el cual el agente jugador artificial
-%   consiga situarse en una posición de victoria, la evaluación se asigna con un 
-%   valor superior al que puede tomar MiniMax a partir de la función heurística,
+%   En este caso al encontrar un estado en el cual el agente jugador consiga
+%   situarse en una posición de victoria, la evaluación se asigna con un valor
+%   superior al que puede tomar MiniMax a partir de la función heurística,
 %   de esta manera prioriza esta jugada incluso si la profundidad de busqueda es
 %   mayor a 1.
 
@@ -292,7 +292,7 @@ evaluación_heurística((Tablero,Jugador),Evaluación) :-
     Jugador = 2,
     símbolo(2,Símbolo),
     posiciones_de_victoria(Símbolo,Tablero),
-    Evaluación is 100, !.
+    Evaluación is 10, !.
 
 evaluación_heurística((Tablero,_),Evaluación) :-
     símbolo(2,IA),
