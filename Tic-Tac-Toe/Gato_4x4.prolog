@@ -59,14 +59,19 @@
 %   - Para realizar un tiro ya dentro de la partida de Gato, se debe ingresar el
 %     tiro, cuando sea solicitado, de la siguiente manera:
 %
-%                                  [Columna,Fila]
+%                                  [Columna,Fila].
 %
 %   Las columnas son representadas por las letras: A,B,C y D
 %   Las filas son representadas por los números: 1,2,3 y 4
 %
-%                                   Ejemplo: ['A',3]
+%                                   Ejemplo: ['A',3].
 %
 %                               "Fila A en la columna 3"
+%
+%   - Una vez que la IA realiza su tiro se solicita al jugador que presione cualquier
+%     tecla, para ello ingresar un carácter seguido de un punto y presionar Enter.
+%
+%                                Ejemplo: a + . + Enter
 %
 % =================================================================================== %
 
