@@ -291,7 +291,7 @@ minimax(Estado, Alpha, Beta, Mejor_jugada, Evaluación, Profundidad):-
 minimax(Estado, _, _, Estado, Evaluación, _):-
     Estado = estado_mancala(Tablero, 1, _, _, _),
     jugada_asesina(Tablero,Evaluación),
-    nl, write("Se evadió una jugada asesina"), nl, !.
+    nl, ansi_format([bold,fg(red)], 'Se evadió una jugada asesina', []), nl, !.
 
 %    , Diferencia_1 >= 0, Diferencia_1 =< 2
 minimax(Estado, _, _, Estado, Evaluación, _):-
@@ -307,7 +307,7 @@ minimax(Estado, _, _, Estado, Evaluación, _):-
     Fila is Diferencia_1 + Diferencia_2 + Diferencia_3 + Diferencia_4 + Diferencia_5 + Diferencia_6,
     Fila =< 6, Fila >= 0,
     Evaluación is -100,
-    nl, write("Se agregó jugada asesina"), nl,
+    nl, ansi_format([bold,fg(red)], 'Se agregó al registro una jugada asesina', []), nl,
     assert(jugada_asesina(Tablero,Evaluación)), !.
 
 minimax(Estado, _, _, Estado, Evaluación, _):-
