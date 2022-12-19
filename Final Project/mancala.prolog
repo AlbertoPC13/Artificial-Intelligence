@@ -204,10 +204,15 @@ iniciar_juego(Profundidad):-
 
 % ============================================================================================== %
 
+% ============================================================================================== %
+%   iniciar_juego/0. Inicia un juego de Mancala de IA vs IA.
+
 iniciar_juego():-
     nombre_jugador(1, Jugador1),
     nombre_jugador(2, Jugador2),
     iniciar_juego(Jugador1, Jugador2, 6, 3, minimax_AB, minimax_AB,6,6), !.
+
+% ============================================================================================== %
 
 % ============================================================================================== %
 %   jugar/10. Realiza un turno de juego en el juego de Mancala.
